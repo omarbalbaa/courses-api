@@ -17,15 +17,19 @@ app.use(express.json());
 app.use(cors());
 
 const coursesRouter = require("./routes/courses.route");
+const usersRouter = require("./routes/users.route");
+
 app.use("/api/courses", coursesRouter);
+app.use('/api/users', usersRouter);
+
+app.use((error, req, res, next) => {
+  res.status(error.statusCode || 500).json({status: error.statusText || httpStatusText.ERROR, message: error.message, code: error.statusCode || 500});
+})
 
 app.all('*', (req, res, next) => {
   return res.status(404).json({status: httpStatusText.ERROR, message: 'this resource is not available'})
 })
 
-app.use((error, req, res, next) => {
-  res.status(error.statusCode || 500).json({status: statusText || httpStatusText.ERROR, message: error.message, code: error.statusCode || 500});
-})
 
 const port = 4000;
 app.listen(process.env.PORT || port, () => {
