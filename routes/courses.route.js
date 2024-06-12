@@ -3,11 +3,13 @@ const { body } = require("express-validator");
 const router = express.Router();
 
 const courseController = require("../controllers/courses.controllers");
-const { validationSchema } = require('../middlewares/validationSchema')
+const { validationSchema } = require('../middlewares/validationSchema');
+const verifyToken = require("../middlewares/verifyToken");
+
 router
   .route("/")
   .get(courseController.getAllCourses)
-  .post(
+  .post(verifyToken,
     validationSchema(),
     courseController.addCourse
   );
