@@ -21,7 +21,7 @@ const getAllUsers = asyncWrapper(async (req, res) => {
 });
 
 const register = asyncWrapper(async (req, res, next) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, role } = req.body;
   
   const oldUser = await User.findOne({email: email});
   if(oldUser) {
@@ -34,7 +34,9 @@ const register = asyncWrapper(async (req, res, next) => {
     firstName,
     lastName,
     email,
-    password : hashedPassword
+    password : hashedPassword,
+    role,
+    avatar: req.file.filename
   });
 
   const token = await generateJWT({email: newUser.email, id: newUser._id});
@@ -61,7 +63,7 @@ const login = asyncWrapper(async (req, res, next) => {
   const matchedPassword = await bcrypt.compare(password, user.password);
 
   if (user && matchedPassword){
-    const token = await generateJWT({email: user.email, id: user._id});
+    const token = await generateJWT({email: user.email, id: user._id, role: user.role});
     return res.json({ status: httpStatusText.SUCCESS, data: {token} });
   }else {
     const error = appError.create('something went wrong', 500, httpStatusText.ERROR)
